@@ -57,7 +57,6 @@ const Chat = (props: ChatProps, ref: any) => {
 
   const [currentMessage, setCurrentMessage] = useState<string>('')
 
-  const USE_HARDCODED = true
   const textAreaRef = useRef<HTMLElement>(null) as React.MutableRefObject<HTMLElement>
 
   const conversation = useRef<ChatMessage[]>([])
@@ -211,6 +210,24 @@ const Chat = (props: ChatProps, ref: any) => {
       const json = await res.json()
       if (res.ok) {
         toast.success('Exported chat: ' + (json.path || 'done'))
+        // also show the exported path as a chat message
+        try {
+          const exportedPath = json.path || 'done'
+          conversation.current = [
+            ...conversation.current,
+            { content: `Exported chat: ${exportedPath}`, role: 'system' }
+          ]
+          // persist and refresh UI
+          conversationRef.current = conversation.current
+          saveMessages?.(conversation.current)
+          forceUpdate?.()
+          // // scroll to bottom so the new message is visible
+          if (bottomOfChatRef.current) {
+            bottomOfChatRef.current.scrollIntoView({ behavior: 'smooth' })
+          }
+        } catch (err) {
+          console.warn('failed to append export path to conversation', err)
+        }
       } else {
         toast.error(json.error || 'Export failed')
       }

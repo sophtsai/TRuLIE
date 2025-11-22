@@ -18,6 +18,7 @@ export interface MessageProps {
 export const Message = (props: MessageProps) => {
   const { role, content } = props.message
   const isUser = role === 'user'
+  const isAssistant = role === 'assistant'
   const copy = useCopyToClipboard()
   const [copied, setCopied] = useState<boolean>(false)
   const [vote, setVote] = useState<'yes' | 'no' | null>(null)
@@ -77,7 +78,7 @@ export const Message = (props: MessageProps) => {
               <div className="leading-relaxed whitespace-pre-wrap">
                 <Markdown>{content}</Markdown>
               </div>
-              {content && (
+              {content && isAssistant && (
                 <div>
                   <div className="opacity-70 group-hover:opacity-100 transition-opacity duration-200 pt-2 border-border/50 mt-2">
                     <Tooltip>
