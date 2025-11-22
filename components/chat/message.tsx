@@ -39,13 +39,14 @@ export const Message = (props: MessageProps) => {
       toast.success(`You voted ${choice === 'yes' ? 'Yes' : 'No'}`)
       // Save vote to server log
       try {
-        void fetch('/api/log', {
+        const plain = sanitizeHtml(content || '').substring(0, 50) // limit to 50 chars for logging
+        void fetch('/api/log/buffer', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             sessionId: currentChatRef?.current?.id || 'anon',
             role: 'vote',
-            content: `Vote - ${choice}`
+            content: `Vote - ${choice} = ${plain}`
           })
         })
       } catch (e) {
@@ -73,7 +74,7 @@ export const Message = (props: MessageProps) => {
             ></div>
           ) : (
             <div className="space-y-3">
-              <div className="leading-relaxed">
+              <div className="leading-relaxed whitespace-pre-wrap">
                 <Markdown>{content}</Markdown>
               </div>
               {content && (
